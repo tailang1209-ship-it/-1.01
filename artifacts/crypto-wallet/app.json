@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "CryptoVault",
-    "slug": "crypto-wallet",
+    "name": "UK Wallet",
+    "slug": "ukwallet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "crypto-wallet",
+    "scheme": "ukwallet",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -14,10 +14,12 @@
       "backgroundColor": "#0A0B14"
     },
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ukwallet.app"
     },
     "android": {
-      "backgroundColor": "#0A0B14"
+      "backgroundColor": "#0A0B14",
+      "package": "com.ukwallet.app"
     },
     "web": {
       "favicon": "./assets/images/icon.png",
