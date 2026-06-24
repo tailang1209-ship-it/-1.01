@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -35,6 +36,19 @@ export default function SettingsScreen() {
   const [copiedAddress, setCopiedAddress] = useState(false);
 
   const bottomPad = Platform.OS === "web" ? 34 : insets.bottom;
+
+  const adminUrl = process.env.EXPO_PUBLIC_DOMAIN
+    ? `https://${process.env.EXPO_PUBLIC_DOMAIN}/admin`
+    : null;
+
+  const handleOpenAdmin = async () => {
+    if (!adminUrl) {
+      Alert.alert("提示", "管理后台地址未配置");
+      return;
+    }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await Linking.openURL(adminUrl);
+  };
 
   const handleCopyAddress = async () => {
     if (!address) return;
@@ -179,6 +193,16 @@ export default function SettingsScreen() {
             label="当前网络"
             value={network.name}
             onPress={() => setShowNetworks(true)}
+          />
+        </View>
+
+        <Section title="管理" />
+        <View style={styles.group}>
+          <Row
+            icon="🔐"
+            label="管理后台"
+            value={adminUrl ? "浏览器打开" : "未配置"}
+            onPress={handleOpenAdmin}
           />
         </View>
 
