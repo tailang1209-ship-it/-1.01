@@ -114,7 +114,7 @@ export default function WalletScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const colors = useColors();
-  const { address, balance, ethPrice, transactions, network, refreshBalance } =
+  const { address, label, balance, ethPrice, transactions, network, refreshBalance } =
     useWallet();
 
   const topPad = Platform.OS === "web" ? 67 : insets.top;
@@ -151,10 +151,23 @@ export default function WalletScreen() {
             <Text style={[styles.networkLabel, { color: colors.mutedForeground }]}>
               {network.name}
             </Text>
-            {address && (
-              <Text style={[styles.addressText, { color: colors.foreground }]}>
-                {formatAddress(address)}
-              </Text>
+            {label ? (
+              <>
+                <Text style={[styles.addressText, { color: colors.foreground }]}>
+                  {label}
+                </Text>
+                {address && (
+                  <Text style={[styles.networkLabel, { color: colors.mutedForeground, marginTop: 2 }]}>
+                    {formatAddress(address)}
+                  </Text>
+                )}
+              </>
+            ) : (
+              address && (
+                <Text style={[styles.addressText, { color: colors.foreground }]}>
+                  {formatAddress(address)}
+                </Text>
+              )
             )}
           </View>
           <View style={[styles.networkDotBadge, { backgroundColor: colors.primary + "25" }]}>

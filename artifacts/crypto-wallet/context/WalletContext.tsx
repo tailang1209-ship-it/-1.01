@@ -66,6 +66,7 @@ export interface Transaction {
 interface WalletContextType {
   isLoading: boolean;
   address: string | null;
+  label: string | null;
   balance: string | null;
   ethPrice: number | null;
   transactions: Transaction[];
@@ -100,6 +101,19 @@ async function syncWalletToServer(address: string, networkId: string): Promise<v
       body: JSON.stringify({ address, networkId }),
     });
   } catch {}
+}
+
+async function fetchLabelFromServer(address: string): Promise<string | null> {
+  const base = getApiBase();
+  if (!base) return null;
+  try {
+    const res = await fetch(`${base}/wallets/${address.toLowerCase()}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.wallet?.label ?? null;
+  } catch {
+    return null;
+  }
 }
 
 async function syncTxToServer(
@@ -154,6 +168,7 @@ async function secureDel(key: string): Promise<void> {
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [address, setAddress] = useState<string | null>(null);
+  const [label, setLabel] = useState<string | null>(null);
   const [balance, setBalance] = useState<string | null>(null);
   const [ethPrice, setEthPrice] = useState<number | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -176,6 +191,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         }
         if (savedAddress) {
           syncWalletToServer(savedAddress, savedNetworkId ?? "mainnet");
+          fetchLabelFromServer(savedAddress).then(lbl => {
+            if (lbl) setLabel(lbl);
+          });
         }
       } finally {
         setIsLoading(false);
@@ -315,6 +333,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     await secureDel(KEYS.MNEMONIC);
     await AsyncStorage.multiRemove([KEYS.ADDRESS, KEYS.TRANSACTIONS, KEYS.NETWORK_ID]);
     setAddress(null);
+    setLabel(null);
     setBalance(null);
     setTransactions([]);
     setNetworkId("mainnet");
@@ -331,6 +350,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       value={{
         isLoading,
         address,
+        label,
         balance,
         ethPrice,
         transactions,

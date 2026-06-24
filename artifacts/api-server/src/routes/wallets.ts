@@ -80,4 +80,27 @@ router.get("/wallets/:address", async (req, res) => {
   }
 });
 
+router.patch("/wallets/:address", async (req, res) => {
+  try {
+    const { address } = req.params;
+    const { label } = req.body as { label?: string | null };
+
+    const [updated] = await db
+      .update(walletsTable)
+      .set({ label: label?.trim() || null })
+      .where(eq(walletsTable.address, address.toLowerCase()))
+      .returning();
+
+    if (!updated) {
+      res.status(404).json({ error: "Wallet not found" });
+      return;
+    }
+
+    res.json({ wallet: updated });
+  } catch (err) {
+    req.log.error({ err }, "Failed to update wallet label");
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 export default router;
